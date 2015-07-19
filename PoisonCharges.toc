@@ -1,0 +1,7 @@
+## Interface: 11200
+## Title: PoisonCharges
+## Author: StafordDev
+## Version: 1.0
+## Notes: This addon will show your poisons charges of your weapons and its remaining time
+
+PoisonCharges.lua
