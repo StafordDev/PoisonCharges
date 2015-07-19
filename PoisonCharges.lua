@@ -1,6 +1,7 @@
-function UpdateTime()
+function UpdateTime() -- it's our function to update frames
 	local _, mht, mh, _, oht, oh = GetWeaponEnchantInfo()
-	if mh ~= nil then
+	if mh ~= nil then -- Main Hand
+		-- first we need to calculate a time
 		local mht1 = ceil(mht / 1000 / 60)
 		local mht2 = 60 - floor((mht1 * 60) - (mht / 1000))
 		mht2 = mht2 - 1
@@ -14,7 +15,7 @@ function UpdateTime()
 			mht2 = 0
 		end
 		if mht2 < 10 then 
-			PoisonMH2:SetText(mht1..":0"..mht2)
+			PoisonMH2:SetText(mht1..":0"..mht2) -- for some beauty we added an extra "0" for seconds less 10
 		else
 			PoisonMH2:SetText(mht1..":"..mht2)
 		end
@@ -23,7 +24,7 @@ function UpdateTime()
 		PoisonMH1:SetText("Not applied!")
 		PoisonMH2:SetText()
 	end
-	if oh ~= nil then
+	if oh ~= nil then -- Off Hand
 		local oht1 = ceil(oht / 1000 / 60)
 		local oht2 = 60 - floor((oht1 * 60) - (oht / 1000))
 		oht2 = oht2 - 1
@@ -46,7 +47,7 @@ function UpdateTime()
 		PoisonOH1:SetText("Not applied!")
 		PoisonOH2:SetText()
 	end
-	if not (UnitAffectingCombat("player")) then
+	if not (UnitAffectingCombat("player")) then -- slowly visible while not in combat
 		PoisonMH1:SetAlpha(0.2)
 		PoisonMH2:SetAlpha(0.2)
 		PoisonMH3:SetAlpha(0.2)
@@ -54,7 +55,7 @@ function UpdateTime()
 		PoisonOH2:SetAlpha(0.2)
 		PoisonOH3:SetAlpha(0.2)
 	end
-	if UnitAffectingCombat("player") then
+	if UnitAffectingCombat("player") then -- more visible while in combat
 		PoisonMH1:SetAlpha(1)
 		PoisonMH2:SetAlpha(1)
 		PoisonMH3:SetAlpha(1)
@@ -66,8 +67,8 @@ end
 
 PoisonChargesVisible = 1
 
-SLASH_POISONCHARGES1, SLASH_POISONCHARGES2 = '/poisoncharges', '/pc'
-function SlashCmdList.POISONCHARGES(msg, editbox)
+SLASH_POISONCHARGES1, SLASH_POISONCHARGES2 = '/poisoncharges', '/pc' -- resister slash commands
+function SlashCmdList.POISONCHARGES(msg, editbox) -- toggle frames visibility
 	if PoisonChargesVisible == 1 then
 		PoisonChargesVisible = 0
 		PoisonCharges1:Hide()
@@ -79,14 +80,14 @@ function SlashCmdList.POISONCHARGES(msg, editbox)
 	end
 end
 
-SLASH_POISONCHARGESINFO1, SLASH_POISONCHARGESINFO2 = '/poisonchargesinfo', '/pci'
-function SlashCmdList.POISONCHARGESINFO(msg, editbox)
+SLASH_POISONCHARGESINFO1, SLASH_POISONCHARGESINFO2 = '/poisonchargesinfo', '/pci' -- register slash commands
+function SlashCmdList.POISONCHARGESINFO(msg, editbox) -- shows addon info
 	DEFAULT_CHAT_FRAME:AddMessage("PoisonCharges addon v1.0 by StafordDev. Type '/poisoncharges' or '/pc' to toggle poisons info.")
 end
 
-DEFAULT_CHAT_FRAME:AddMessage("PoisonCharges v1.0 loaded. Type '/poisonchargesinfo' or '/pci' to show help.")
+DEFAULT_CHAT_FRAME:AddMessage("PoisonCharges v1.0 loaded. Type '/poisonchargesinfo' or '/pci' to show help.") -- message when addon is loaded
 local _, mht, mh, _, oht, oh = GetWeaponEnchantInfo()
-PoisonCharges1 = CreateFrame("Frame", nil, UIParent)
+PoisonCharges1 = CreateFrame("Frame", nil, UIParent) -- frame for main hand
 PoisonCharges1:SetFrameStrata("BACKGROUND")
 PoisonCharges1:SetWidth(128)
 PoisonCharges1:SetHeight(64)
@@ -110,7 +111,7 @@ PoisonMH3:SetAlpha(0.2)
 PoisonCharges1:SetScript("OnUpdate", UpdateTime)
 PoisonCharges1:Show()
 
-PoisonCharges2 = CreateFrame("Frame", nil, UIParent)
+PoisonCharges2 = CreateFrame("Frame", nil, UIParent) -- frame for off hand
 PoisonCharges2:SetFrameStrata("BACKGROUND")
 PoisonCharges2:SetWidth(128)
 PoisonCharges2:SetHeight(64)
