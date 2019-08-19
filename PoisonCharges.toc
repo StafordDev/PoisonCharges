@@ -1,7 +1,9 @@
 ## Interface: 11200
 ## Title: PoisonCharges
 ## Author: StafordDev
-## Version: 1.0
-## Notes: This addon will show your poisons charges of your weapons and its remaining time
+## Version: 1.1
+## Notes: This addon will show remaining charges of your applied poisons and when it's going to expire. Addon also allows you to apply them easier.
+## SavedVariablesPerCharacter: PC_State, PC_MH, PC_OH, PC_MinimapPos
 
 PoisonCharges.lua
+PoisonCharges.xml

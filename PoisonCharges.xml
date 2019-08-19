@@ -1,0 +1,177 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+	<Script file="PoisonCharges.lua"/>
+	<Frame name="PoisonCharges">
+		<Scripts>
+			<OnLoad>
+				PoisonCharges_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				PoisonCharges_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Frame
+		name="PoisonChargesSettingsFrame"
+		toplevel="true"
+		frameStrata="DIALOG"
+		movable="true"
+		enableMouse="true"
+		hidden="true"
+		parent="UIParent">
+		<Size>
+			<AbsDimension x="260" y="190"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset><AbsDimension x="0" y="200"/></Offset>
+			</Anchor>
+		</Anchors>
+		<Backdrop
+			bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+			edgeFile="Interface\DialogFrame\UI-DialogBox-Border"
+			tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="PoisonChargesSettingsFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size>
+						<AbsDimension x="356" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP">
+							<Offset>
+								<AbsDimension x="0" y="12"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString inherits="GameFontNormal" text="PoisonCharges">
+					<Anchors>
+						<Anchor point="TOP" relativeTo="PoisonChargesSettingsFrameHeader">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="PCDropDownMH" inherits="UIDropDownMenuTemplate">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="MH Poison:">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="21" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-45"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						PCDropDownMH_OnShow();
+					</OnShow>
+				</Scripts>
+			</Button>
+			<Button name="PCDropDownOH" inherits="UIDropDownMenuTemplate">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentLabel" inherits="GameFontNormalSmall" text="OH Poison:">
+							<Anchors>
+								<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="21" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-95"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						PCDropDownOH_OnShow();
+					</OnShow>
+				</Scripts>
+			</Button>
+			<Button name="PoisonChargesSettingsBtn1" inherits="UIPanelButtonTemplate" text="Toggle">
+				<Size>
+					<AbsDimension x="100" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="30" y="55"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PC_Toggle()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="PoisonChargesSettingsBtn2" inherits="UIPanelButtonTemplate" text="Close">
+				<Size>
+					<AbsDimension x="100" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="135" y="55"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PC_SettingsToggle()
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				PoisonChargesSettingsFrame:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnShow>
+				PlaySound("UChatScrollButton");
+			</OnShow>
+			<OnHide>
+				PlaySound("UChatScrollButton");
+			</OnHide>
+			<OnDragStart>
+				PoisonChargesSettingsFrame:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				PoisonChargesSettingsFrame:StopMovingOrSizing();
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+</Ui>		
