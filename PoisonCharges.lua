@@ -1,8 +1,8 @@
 PoisonCharges1 = CreateFrame("Frame", nil, UIParent) -- frame for main hand
 PoisonCharges2 = CreateFrame("Frame", nil, UIParent) -- frame for off hand
 
-PoisonCharges_Btn1 = CreateFrame("Button", nil, UIParent) -- frame for main hand apply poison button
-PoisonCharges_Btn2 = CreateFrame("Button", nil, UIParent) -- frame for off hand apply poison button
+PoisonCharges_Btn1 = CreateFrame("Button", nil, UIParent, "SecureActionButtonTemplate") -- frame for main hand apply poison button
+PoisonCharges_Btn2 = CreateFrame("Button", nil, UIParent, "SecureActionButtonTemplate") -- frame for off hand apply poison button
 
 PoisonCharges_Btn1_Count = CreateFrame("Frame", nil, UIParent) -- frame for main hand poison count
 PoisonCharges_Btn2_Count = CreateFrame("Frame", nil, UIParent) -- frame for off hand poison count
@@ -10,13 +10,14 @@ PoisonCharges_Btn2_Count = CreateFrame("Frame", nil, UIParent) -- frame for off 
 PoisonChargesFrameShown = false
 
 -- onLoad function
-function PoisonCharges_OnLoad()
-	this:RegisterEvent("ADDON_LOADED");
+function PoisonCharges_OnLoad(self)
+	self:RegisterEvent("ADDON_LOADED");
 end
 
 -- onEvent function
-function PoisonCharges_OnEvent(event)
-	if event == "ADDON_LOADED" and arg1 == "PoisonCharges" then
+function PoisonCharges_OnEvent(self, event, ...)
+	local addonName = select (1, ...)
+	if event == "ADDON_LOADED" and addonName == "PoisonCharges" then
 
 	-- initialize variables if this is the first time this addon loaded
 	if PC_State == nil then
@@ -29,79 +30,33 @@ function PoisonCharges_OnEvent(event)
 		PC_OH = "Not selected"
 	end
 	if PC_MinimapPos == nil then
-		PC_MinimapPos = 90
+		print("test")
+		PC_MinimapPos = {
+			["minimapPos"] = 90,
+			["hide"] = false,
+		}
 	end
 	
-	-- minimap button
-	PC_Minimap = CreateFrame("Button", "PoisonChargesMap", Minimap)
-	PC_Minimap:SetFrameStrata("MEDIUM")
-	PC_Minimap:SetWidth(32)
-	PC_Minimap:SetHeight(32)
-	PC_Minimap:ClearAllPoints()
-	PC_Minimap:SetPoint("TOPLEFT", Minimap,"TOPLEFT",54-(75*cos(PC_MinimapPos)),(75*sin(PC_MinimapPos))-55) 
-	PC_Minimap:SetHighlightTexture("Interface\\MINIMAP\\UI-Minimap-ZoomButton-Highlight", "ADD")
-	PC_Minimap:RegisterForDrag("RightButton")
-	PC_Minimap.texture = PC_Minimap:CreateTexture(nil, "BUTTON")
-	PC_Minimap.texture:SetTexture("Interface\\AddOns\\PoisonCharges\\media\\PoisonCharges_Icon")
-	PC_Minimap.texture:SetPoint("CENTER", PC_Minimap)
-	PC_Minimap.texture:SetWidth(20)
-	PC_Minimap.texture:SetHeight(20)
-
-	PC_Minimap.border = PC_Minimap:CreateTexture(nil, "BORDER")
-	PC_Minimap.border:SetTexture("Interface\\MINIMAP\\MiniMap-TrackingBorder")
-	PC_Minimap.border:SetPoint("TOPLEFT", PC_Minimap.texture, -6, 5)
-	PC_Minimap.border:SetWidth(52)
-	PC_Minimap.border:SetHeight(52)
-
-	PC_Minimap.notifyText = PC_Minimap:CreateTexture(nil, "OVERLAY")
-	PC_Minimap.notifyText:SetTexture("Interface\\MINIMAP\\UI-Minimap-ZoomButton-Highlight")
-	PC_Minimap.notifyText:SetBlendMode("ADD")
-	PC_Minimap.notifyText:SetAllPoints()
-	PC_Minimap.notifyText:Hide()
-	PC_Minimap:SetScript("OnMouseDown", function()
-		point, relativeTo, relativePoint, xOffset, yOffset = PC_Minimap.texture:GetPoint(1)
-		PC_Minimap.texture:SetPoint(point, relativeTo, relativePoint, xOffset + 2, yOffset - 2)
-	end);
-	PC_Minimap:SetScript("OnLeave", function(self, button)
-		PC_MinimapTool:Hide()
-		PC_Minimap.notifyText:Hide()
-		PC_Minimap.texture:SetPoint("CENTER", PC_Minimap)
-	end);
-	PC_Minimap:SetScript("OnMouseUp", function()
-		if arg1 == "LeftButton" then
-			PC_SettingsToggle()
-		end
-		PC_Minimap.texture:SetPoint("CENTER", PC_Minimap)
-	end);
-	PC_Minimap:SetScript("OnDragStart", function()
-		miniDrag = true
-	end)
-	PC_Minimap:SetScript("OnDragStop", function()
-		miniDrag = false
-	end)
-	PC_Minimap:SetScript("OnUpdate", function()
-		if miniDrag then
-			local xpos,ypos = GetCursorPosition() 
-			local xmin,ymin = Minimap:GetLeft(), Minimap:GetBottom() 
-
-			xpos = xmin-xpos/UIParent:GetScale()+70 
-			ypos = ypos/UIParent:GetScale()-ymin-70 
-					
-			PC_MinimapPos = math.deg(math.atan2(ypos,xpos))
-			if (PC_MinimapPos < 0) then
-				PC_MinimapPos = PC_MinimapPos + 360
-			end
-			this:SetPoint("TOPLEFT", Minimap,"TOPLEFT",54-(75*cos(PC_MinimapPos)),(75*sin(PC_MinimapPos))-55) 
-		end
-	end)
-	CreateFrame("GameTooltip", "PC_MinimapTool", nil, "GameTooltipTemplate")
-	PC_Minimap:SetScript("OnEnter", function()
-		PC_MinimapTool:SetOwner( this, "ANCHOR_CURSOR" );
-		PC_MinimapTool:AddLine("PoisonCharges", 1, 1, 1, 1)
-		PC_MinimapTool:AddLine("Left-click to open PoisonCharges menu.")
-		PC_MinimapTool:AddLine("Right-click to move this button.")
-		PC_MinimapTool:Show()
-	end)
+    local LDB = LibStub("LibDataBroker-1.1", true)
+    local LDBIcon = LDB and LibStub("LibDBIcon-1.0", true)
+    if LDB then
+        local PC_MinimapBtn = LDB:NewDataObject("PoisonCharges", {
+            type = "launcher",
+			text = "PoisonCharges",
+            icon = "Interface\\AddOns\\PoisonCharges\\media\\PoisonCharges_Icon",
+            OnClick = function(_, button)
+                if button == "LeftButton" then PC_SettingsToggle() end
+            end,
+            OnTooltipShow = function(tt)
+                tt:AddLine("PoisonCharges")
+				tt:AddLine("|cffffff00Left|r-click to show PoisonCharges settings.")
+				tt:AddLine("Hold |cffffff00left|r to move this button.")
+            end,
+        })
+        if LDBIcon then
+            LDBIcon:Register("PoisonCharges", PC_MinimapBtn, PC_MinimapPos)
+        end
+    end
 	
 	-- work only if player is Rogue level 20 and above
 	--if UnitClass("player") == "Rogue" and UnitLevel("player") >= 20 then
@@ -176,74 +131,50 @@ function PoisonCharges_OnEvent(event)
 	PoisonCharges_Btn1:SetHeight(32)
 	PoisonCharges_Btn1:SetPoint("CENTER", UIParent, "CENTER", -90, -45)
 	PoisonCharges_Tex1 = PoisonCharges_Btn1:CreateTexture(nil,"BACKGROUND")
-	if strfind(PC_MH, "Instant") then
+	if strfind(PC_MH, "Instant") or strfind(PC_MH, "Быстродействующий") then
 		PoisonCharges_Tex1:SetTexture("Interface\\Icons\\Ability_Poisons")
 	end
-	if strfind(PC_MH, "Deadly") then
+	if strfind(PC_MH, "Deadly") or strfind(PC_MH, "Смертельный") then
 		PoisonCharges_Tex1:SetTexture("Interface\\Icons\\Ability_Rogue_Dualweild")
 	end
-	if strfind(PC_MH, "Mind-numbing") then
+	if strfind(PC_MH, "Mind-numbing") or strfind(PC_MH, "Дурманящий") then
 		PoisonCharges_Tex1:SetTexture("Interface\\Icons\\Spell_Nature_Nullifydisease")
 	end
-	if strfind(PC_MH, "Crippling") then
+	if strfind(PC_MH, "Crippling") or strfind(PC_MH, "Калечащий") then
 		PoisonCharges_Tex1:SetTexture("Interface\\Icons\\Inv_Potion_19")
 	end
-	if strfind(PC_MH, "Wound") then
+	if strfind(PC_MH, "Wound") or strfind(PC_MH, "Нейтрализующий") then
 		PoisonCharges_Tex1:SetTexture("Interface\\Icons\\Ability_Poisonsting")
 	end
 	PoisonCharges_Tex1:SetAllPoints(PoisonCharges_Btn1)
 	PoisonCharges_Btn1.texture = PoisonCharges_Tex1
-	PoisonCharges_Btn1:SetScript("OnClick", function(self, arg1)
-		for i = 0, 4 do
-			for j = 1, 18 do
-				local h=GetContainerItemLink
-				if not(h(i, j) == nil) then
-					if h(i, j) == PC_MH then
-						UseContainerItem(i, j)
-						PickupInventoryItem(16)
-						ReplaceEnchant()
-					end
-				end
-			end
-		end
-	end)
+	PoisonCharges_Btn1:SetAttribute("type1", "macro")
+	PoisonCharges_Btn1:SetAttribute("macrotext1", "/use "..PC_MH.."\n/use 16\n/click StaticPopup1Button1")
 	
 	PoisonCharges_Btn2:SetFrameStrata("BACKGROUND")
 	PoisonCharges_Btn2:SetWidth(32)
 	PoisonCharges_Btn2:SetHeight(32)
 	PoisonCharges_Btn2:SetPoint("CENTER", UIParent, "CENTER", 90, -45)
 	PoisonCharges_Tex2 = PoisonCharges_Btn2:CreateTexture(nil,"BACKGROUND")
-	if strfind(PC_OH, "Instant") then
+	if strfind(PC_OH, "Instant") or strfind(PC_OH, "Быстродействующий") then
 		PoisonCharges_Tex2:SetTexture("Interface\\Icons\\Ability_Poisons")
 	end
-	if strfind(PC_OH, "Deadly") then
+	if strfind(PC_OH, "Deadly") or strfind(PC_OH, "Смертельный") then
 		PoisonCharges_Tex2:SetTexture("Interface\\Icons\\Ability_Rogue_Dualweild")
 	end
-	if strfind(PC_OH, "Mind-numbing") then
+	if strfind(PC_OH, "Mind-numbing") or strfind(PC_OH, "Дурманящий") then
 		PoisonCharges_Tex2:SetTexture("Interface\\Icons\\Spell_Nature_Nullifydisease")
 	end
-	if strfind(PC_OH, "Crippling") then
+	if strfind(PC_OH, "Crippling") or strfind(PC_OH, "Калечащий") then
 		PoisonCharges_Tex2:SetTexture("Interface\\Icons\\Inv_Potion_19")
 	end
-	if strfind(PC_OH, "Wound") then
+	if strfind(PC_OH, "Wound") or strfind(PC_OH, "Нейтрализующий") then
 		PoisonCharges_Tex2:SetTexture("Interface\\Icons\\Ability_Poisonsting")
 	end
 	PoisonCharges_Tex2:SetAllPoints(PoisonCharges_Btn2)
 	PoisonCharges_Btn2.texture = PoisonCharges_Tex2
-	PoisonCharges_Btn2:SetScript("OnClick", function(self, arg1)
-		for i = 0, 4 do
-			for j = 1, 18 do
-				local h=GetContainerItemLink
-				if not(h(i, j) == nil) then
-					if h(i, j) == PC_OH then
-						UseContainerItem(i, j)
-						PickupInventoryItem(17)
-						ReplaceEnchant()
-					end
-				end
-			end
-		end
-	end)
+	PoisonCharges_Btn2:SetAttribute("type1", "macro")
+	PoisonCharges_Btn2:SetAttribute("macrotext1", "/use "..PC_OH.."\n/use 17\n/click StaticPopup1Button1")
 	
 	PoisonCharges_Btn1_Count:SetFrameStrata("BACKGROUND")
 	PoisonCharges_Btn1_Count:SetWidth(128)
@@ -272,7 +203,7 @@ function PoisonCharges_OnEvent(event)
 	end);
 	CreateFrame("GameTooltip", "PoisonChargesSettingsBtn1_Tool", nil, "GameTooltipTemplate")
 	PoisonChargesSettingsBtn1:SetScript("OnEnter", function()
-		PoisonChargesSettingsBtn1_Tool:SetOwner(this, "ANCHOR_CURSOR");
+		PoisonChargesSettingsBtn1_Tool:SetOwner(self, "ANCHOR_CURSOR");
 		PoisonChargesSettingsBtn1_Tool:AddLine("Toggle addon On and Off", 1, 1, 1, 1)
 		PoisonChargesSettingsBtn1_Tool:Show()
 	end)
@@ -282,20 +213,20 @@ function PoisonCharges_OnEvent(event)
 	end);
 	CreateFrame("GameTooltip", "PoisonChargesSettingsBtn2_Tool", nil, "GameTooltipTemplate")
 	PoisonChargesSettingsBtn2:SetScript("OnEnter", function()
-		PoisonChargesSettingsBtn2_Tool:SetOwner(this, "ANCHOR_CURSOR");
+		PoisonChargesSettingsBtn2_Tool:SetOwner(self, "ANCHOR_CURSOR");
 		PoisonChargesSettingsBtn2_Tool:AddLine("Close this window", 1, 1, 1, 1)
 		PoisonChargesSettingsBtn2_Tool:Show()
 	end)
 	
 	-- message when addon is loaded
-	DEFAULT_CHAT_FRAME:AddMessage("PoisonCharges v1.1 loaded. Type '/poisonchargesinfo' or '/pci' to show help.")
+	DEFAULT_CHAT_FRAME:AddMessage("PoisonCharges v1.2 loaded. Type '/poisonchargesinfo' or '/pci' to show help.")
 	
 	end
 end
 
 -- update frames
 function UpdateTime()
-	local _, mht, mh, _, oht, oh = GetWeaponEnchantInfo()
+	local _, mht, mh, _, _, oht, oh, _ = GetWeaponEnchantInfo()
 	-- Main Hand
 	if mh ~= nil then
 		-- calculating remaining time
@@ -434,21 +365,13 @@ end
 
 -- check if can apply poison
 function CanApply(hand)
-	local regMount = "_mount_";
-   	local aqMount = "_qirajicrystal_"
 	local isMounted = false;
 	local poisonExists = false;
 	
 	-- if not on taxi
     if (not UnitOnTaxi("player")) then
-		for i=0,15,1 do
-			currBuffTex = GetPlayerBuffTexture(i);
-			if (currBuffTex) then
-				-- mount or qiraji mounts
-				if ((string.find(string.lower(currBuffTex), regMount)) or (string.find(string.lower(currBuffTex), aqMount))) then
-					isMounted = true
-				end
-			end
+		if (IsMounted()) then
+			isMounted = true;
 		end
 	end
 	
@@ -457,7 +380,8 @@ function CanApply(hand)
 			for j = 1, 18 do
 				local h=GetContainerItemLink
 				if not(h(i, j) == nil) then
-					if h(i, j) == PC_MH then
+					itemName, _ = GetItemInfo(h(i, j))
+					if itemName == PC_MH then
 						poisonExists = true
 					end
 				end
@@ -468,7 +392,8 @@ function CanApply(hand)
 			for j = 1, 18 do
 				local h=GetContainerItemLink
 				if not(h(i, j) == nil) then
-					if h(i, j) == PC_OH then
+					itemName, _ = GetItemInfo(h(i, j))
+					if itemName == PC_OH then
 						poisonExists = true
 					end
 				end
@@ -492,7 +417,8 @@ function GetPoisonCount(hand)
 			for j = 1, 18 do
 				local h=GetContainerItemLink
 				if not(h(i, j) == nil) then
-					if h(i, j) == PC_MH then
+					itemName, _ = GetItemInfo(h(i, j))
+					if itemName == PC_MH then
 						local _, count = GetContainerItemInfo(i,j)
 						poisonExists = true
 						MHCount = MHCount + count
@@ -506,7 +432,8 @@ function GetPoisonCount(hand)
 			for j = 1, 18 do
 				local h=GetContainerItemLink
 				if not(h(i, j) == nil) then
-					if h(i, j) == PC_OH then
+					itemName, _ = GetItemInfo(h(i, j))
+					if itemName == PC_OH then
 						local _, count = GetContainerItemInfo(i,j)
 						poisonExists = true
 						OHCount = OHCount + count
@@ -525,6 +452,11 @@ function PCDropDownMH_Initialize()
 	poisonsList[3] = "Crippling Poison"
 	poisonsList[4] = "Mind-numbing Poison"
 	poisonsList[5] = "Wound Poison"
+	poisonsList[6] = "Быстродействующий яд"
+	poisonsList[7] = "Смертельный яд"
+	poisonsList[8] = "Калечащий яд"
+	poisonsList[9] = "Дурманящий яд"
+	poisonsList[10] = "Нейтрализующий яд"
 	local info
 	info = {
 				text = "Not selected";
@@ -538,11 +470,12 @@ function PCDropDownMH_Initialize()
 	
 	for i = 0, 4 do
 		for j = 1, 18 do
-			for k = 1, 5 do
+			for k = 1, 10 do
 				local h=GetContainerItemLink
 				if not(h(i, j) == nil) then
 					if strfind(h(i, j), poisonsList[k]) then
-						table.insert(poisonsInInventory, h(i, j))
+						itemName, _ = GetItemInfo(h(i, j))
+						table.insert(poisonsInInventory, itemName)
 						break
 					end
 				end
@@ -570,27 +503,27 @@ end
 function PCDropDownMH_OnShow()
 	UIDropDownMenu_Initialize(PCDropDownMH, PCDropDownMH_Initialize)
 	UIDropDownMenu_SetSelectedValue(PCDropDownMH, PC_MH)
-	UIDropDownMenu_SetWidth(190, PCDropDownMH)
+	UIDropDownMenu_SetWidth(PCDropDownMH, 190)
 end
 
 function PCDropDownMH_OnClick(self, arg1, arg2, checked)
-	PC_MH = this:GetText()
+	PC_MH = self:GetText()
 	UIDropDownMenu_SetSelectedValue(PCDropDownMH, PC_MH)
 	PCDropDownMH_OnShow()
 	local PoisonCharges_Tex1 = PoisonCharges_Btn1:CreateTexture(nil,"BACKGROUND")
-	if strfind(PC_MH, "Instant") then
+	if strfind(PC_MH, "Instant") or strfind(PC_MH, "Быстродействующий") then
 		PoisonCharges_Tex1:SetTexture("Interface\\Icons\\Ability_Poisons")
 	end
-	if strfind(PC_MH, "Deadly") then
+	if strfind(PC_MH, "Deadly") or strfind(PC_MH, "Смертельный") then
 		PoisonCharges_Tex1:SetTexture("Interface\\Icons\\Ability_Rogue_Dualweild")
 	end
-	if strfind(PC_MH, "Mind-numbing") then
+	if strfind(PC_MH, "Mind-numbing") or strfind(PC_MH, "Дурманящий") then
 		PoisonCharges_Tex1:SetTexture("Interface\\Icons\\Spell_Nature_Nullifydisease")
 	end
-	if strfind(PC_MH, "Crippling") then
+	if strfind(PC_MH, "Crippling") or strfind(PC_MH, "Калечащий") then
 		PoisonCharges_Tex1:SetTexture("Interface\\Icons\\Inv_Potion_19")
 	end
-	if strfind(PC_MH, "Wound") then
+	if strfind(PC_MH, "Wound") or strfind(PC_MH, "Нейтрализующий") then
 		PoisonCharges_Tex1:SetTexture("Interface\\Icons\\Ability_Poisonsting")
 	end
 	PoisonCharges_Tex1:SetAllPoints(PoisonCharges_Btn1)
@@ -604,6 +537,11 @@ function PCDropDownOH_Initialize()
 	poisonsList[3] = "Crippling Poison"
 	poisonsList[4] = "Mind-numbing Poison"
 	poisonsList[5] = "Wound Poison"
+	poisonsList[6] = "Быстродействующий яд"
+	poisonsList[7] = "Смертельный яд"
+	poisonsList[8] = "Калечащий яд"
+	poisonsList[9] = "Дурманящий яд"
+	poisonsList[10] = "Нейтрализующий яд"
 	local info
 	info = {
 				text = "Not selected";
@@ -617,11 +555,12 @@ function PCDropDownOH_Initialize()
 	
 	for i = 0, 4 do
 		for j = 1, 18 do
-			for k = 1, 5 do
+			for k = 1, 10 do
 				local h=GetContainerItemLink
 				if not(h(i, j) == nil) then
 					if strfind(h(i, j), poisonsList[k]) then
-						table.insert(poisonsInInventory, h(i, j))
+						itemName, _ = GetItemInfo(h(i, j))
+						table.insert(poisonsInInventory, itemName)
 						break
 					end
 				end
@@ -649,27 +588,27 @@ end
 function PCDropDownOH_OnShow()
 	UIDropDownMenu_Initialize(PCDropDownOH, PCDropDownOH_Initialize)
 	UIDropDownMenu_SetSelectedValue(PCDropDownOH, PC_OH)
-	UIDropDownMenu_SetWidth(190, PCDropDownOH)
+	UIDropDownMenu_SetWidth(PCDropDownOH, 190)
 end
 
 function PCDropDownOH_OnClick(self, arg1, arg2, checked)
-	PC_OH = this:GetText()
+	PC_OH = self:GetText()
 	UIDropDownMenu_SetSelectedValue(PCDropDownOH, PC_OH)
 	PCDropDownOH_OnShow()
 	local PoisonCharges_Tex2 = PoisonCharges_Btn2:CreateTexture(nil,"BACKGROUND")
-	if strfind(PC_OH, "Instant") then
+	if strfind(PC_OH, "Instant") or strfind(PC_OH, "Быстродействующий") then
 		PoisonCharges_Tex2:SetTexture("Interface\\Icons\\Ability_Poisons")
 	end
-	if strfind(PC_OH, "Deadly") then
+	if strfind(PC_OH, "Deadly") or strfind(PC_OH, "Смертельный") then
 		PoisonCharges_Tex2:SetTexture("Interface\\Icons\\Ability_Rogue_Dualweild")
 	end
-	if strfind(PC_OH, "Mind-numbing") then
+	if strfind(PC_OH, "Mind-numbing") or strfind(PC_OH, "Дурманящий") then
 		PoisonCharges_Tex2:SetTexture("Interface\\Icons\\Spell_Nature_Nullifydisease")
 	end
-	if strfind(PC_OH, "Crippling") then
+	if strfind(PC_OH, "Crippling") or strfind(PC_OH, "Калечащий") then
 		PoisonCharges_Tex2:SetTexture("Interface\\Icons\\Inv_Potion_19")
 	end
-	if strfind(PC_OH, "Wound") then
+	if strfind(PC_OH, "Wound") or strfind(PC_OH, "Нейтрализующий") then
 		PoisonCharges_Tex2:SetTexture("Interface\\Icons\\Ability_Poisonsting")
 	end
 	PoisonCharges_Tex2:SetAllPoints(PoisonCharges_Btn2)
@@ -683,5 +622,5 @@ end
 
 SLASH_POISONCHARGESINFO1, SLASH_POISONCHARGESINFO2 = '/poisonchargesinfo', '/pci' -- register slash commands
 function SlashCmdList.POISONCHARGESINFO(msg, editbox) -- shows addon info
-	DEFAULT_CHAT_FRAME:AddMessage("PoisonCharges addon v1.1 by StafordDev. Type '/poisoncharges' or '/pc' to toggle poisons info.")
+	DEFAULT_CHAT_FRAME:AddMessage("PoisonCharges addon v1.2 by StafordDev. Type '/poisoncharges' or '/pc' to toggle poisons info.")
 end
