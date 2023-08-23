@@ -219,7 +219,7 @@ function PoisonCharges_OnEvent(self, event, ...)
 	end)
 	
 	-- message when addon is loaded
-	DEFAULT_CHAT_FRAME:AddMessage("PoisonCharges v1.2 loaded. Type '/poisonchargesinfo' or '/pci' to show help.")
+	DEFAULT_CHAT_FRAME:AddMessage("PoisonCharges v1.2.1 loaded. Type '/poisonchargesinfo' or '/pci' to show help.")
 	
 	end
 end
@@ -378,7 +378,7 @@ function CanApply(hand)
 	if hand == "MH" then
 		for i = 0, 4 do
 			for j = 1, 18 do
-				local h=GetContainerItemLink
+				local h=C_Container.GetContainerItemLink
 				if not(h(i, j) == nil) then
 					itemName, _ = GetItemInfo(h(i, j))
 					if itemName == PC_MH then
@@ -390,7 +390,7 @@ function CanApply(hand)
 	else
 		for i = 0, 4 do
 			for j = 1, 18 do
-				local h=GetContainerItemLink
+				local h=C_Container.GetContainerItemLink
 				if not(h(i, j) == nil) then
 					itemName, _ = GetItemInfo(h(i, j))
 					if itemName == PC_OH then
@@ -415,13 +415,13 @@ function GetPoisonCount(hand)
 	if hand == "MH" then
 		for i = 0, 4 do
 			for j = 1, 18 do
-				local h=GetContainerItemLink
+				local h=C_Container.GetContainerItemLink
 				if not(h(i, j) == nil) then
 					itemName, _ = GetItemInfo(h(i, j))
 					if itemName == PC_MH then
-						local _, count = GetContainerItemInfo(i,j)
+						local itemInfo = C_Container.GetContainerItemInfo(i,j)
 						poisonExists = true
-						MHCount = MHCount + count
+						MHCount = MHCount + itemInfo.stackCount
 					end
 				end
 			end
@@ -430,13 +430,13 @@ function GetPoisonCount(hand)
 	else
 		for i = 0, 4 do
 			for j = 1, 18 do
-				local h=GetContainerItemLink
+				local h=C_Container.GetContainerItemLink
 				if not(h(i, j) == nil) then
 					itemName, _ = GetItemInfo(h(i, j))
 					if itemName == PC_OH then
-						local _, count = GetContainerItemInfo(i,j)
+						local itemInfo = C_Container.GetContainerItemInfo(i,j)
 						poisonExists = true
-						OHCount = OHCount + count
+						OHCount = OHCount + itemInfo.stackCount
 					end
 				end
 			end
@@ -471,7 +471,7 @@ function PCDropDownMH_Initialize()
 	for i = 0, 4 do
 		for j = 1, 18 do
 			for k = 1, 10 do
-				local h=GetContainerItemLink
+				local h=C_Container.GetContainerItemLink
 				if not(h(i, j) == nil) then
 					if strfind(h(i, j), poisonsList[k]) then
 						itemName, _ = GetItemInfo(h(i, j))
@@ -556,7 +556,7 @@ function PCDropDownOH_Initialize()
 	for i = 0, 4 do
 		for j = 1, 18 do
 			for k = 1, 10 do
-				local h=GetContainerItemLink
+				local h=C_Container.GetContainerItemLink
 				if not(h(i, j) == nil) then
 					if strfind(h(i, j), poisonsList[k]) then
 						itemName, _ = GetItemInfo(h(i, j))
@@ -622,5 +622,5 @@ end
 
 SLASH_POISONCHARGESINFO1, SLASH_POISONCHARGESINFO2 = '/poisonchargesinfo', '/pci' -- register slash commands
 function SlashCmdList.POISONCHARGESINFO(msg, editbox) -- shows addon info
-	DEFAULT_CHAT_FRAME:AddMessage("PoisonCharges addon v1.2 by StafordDev. Type '/poisoncharges' or '/pc' to toggle poisons info.")
+	DEFAULT_CHAT_FRAME:AddMessage("PoisonCharges addon v1.2.1 by StafordDev. Type '/poisoncharges' or '/pc' to toggle poisons info.")
 end

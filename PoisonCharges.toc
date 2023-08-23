@@ -1,7 +1,7 @@
-## Interface: 11302
+## Interface: 11404
 ## Title: PoisonCharges
 ## Author: StafordDev
-## Version: 1.2
+## Version: 1.2.1
 ## Notes: This addon will show remaining charges of your applied poisons and when it's going to expire. Addon also allows you to apply them easier.
 ## SavedVariablesPerCharacter: PC_State, PC_MH, PC_OH, PC_MinimapPos
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibDBIcon-1.0, LibDataBroker-1.1, LibClassicItemSets-1.0
